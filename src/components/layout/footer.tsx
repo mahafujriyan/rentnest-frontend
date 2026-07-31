@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Building2, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Building2, Globe, Mail, MessageCircle, Share2 } from "lucide-react";
 import { APP_DESCRIPTION, APP_NAME, NAV_LINKS } from "@/constants";
 import { Separator } from "@/components/ui/separator";
 
@@ -17,7 +17,7 @@ export function Footer() {
             </Link>
             <p className="text-sm text-muted-foreground">{APP_DESCRIPTION}</p>
             <div className="flex gap-3">
-              {[Twitter, Facebook, Instagram, Linkedin].map((Icon, i) => (
+              {[Share2, Globe, MessageCircle, Mail].map((Icon, i) => (
                 <Link
                   key={i}
                   href="#"

@@ -31,4 +31,10 @@ export const authService = {
     if (!data.data) throw new Error(data.message || "Failed to fetch profile");
     return data.data;
   },
+
+  updateProfile: async (profileData: { name: string; phone?: string }): Promise<User> => {
+    const { data } = await api.patch<ApiResponse<User>>("/auth/me", profileData);
+    if (!data.data) throw new Error(data.message || "Failed to update profile");
+    return data.data;
+  },
 };

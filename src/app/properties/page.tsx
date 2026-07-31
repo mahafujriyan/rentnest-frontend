@@ -113,7 +113,7 @@ export default function PropertiesPage() {
           defaultValue={[filters.minPrice || 0, filters.maxPrice || 5000]}
           max={10000}
           step={100}
-          onValueCommit={([min, max]) => {
+          onValueCommitted={([min, max]) => {
             updateFilter("minPrice", min > 0 ? String(min) : null);
             updateFilter("maxPrice", max < 10000 ? String(max) : null);
           }}

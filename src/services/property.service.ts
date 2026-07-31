@@ -27,6 +27,11 @@ export const propertyService = {
     return data.data || [];
   },
 
+  getLandlordProperties: async (): Promise<Property[]> => {
+    const { data } = await api.get<ApiResponse<Property[]>>("/landlord/properties");
+    return data.data || [];
+  },
+
   create: async (propertyData: CreatePropertyData): Promise<Property> => {
     const { data } = await api.post<ApiResponse<Property>>(
       "/landlord/properties",

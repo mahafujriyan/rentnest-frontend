@@ -49,6 +49,7 @@ export function useUpdateRentalStatus() {
       rentalService.updateStatus(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: rentalKeys.all });
+      queryClient.invalidateQueries({ queryKey: rentalKeys.landlord() });
     },
   });
 }

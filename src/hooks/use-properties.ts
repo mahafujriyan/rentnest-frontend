@@ -64,3 +64,21 @@ export function useDeleteProperty() {
     },
   });
 }
+
+export function useLandlordProperties() {
+  return useQuery({
+    queryKey: [...propertyKeys.all, "landlord"] as const,
+    queryFn: () => propertyService.getLandlordProperties(),
+  });
+}
+
+export function useToggleAvailability() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, isAvailable }: { id: string; isAvailable: boolean }) =>
+      propertyService.toggleAvailability(id, isAvailable),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: propertyKeys.all });
+    },
+  });
+}
