@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: "What if I need to cancel a rental?",
-    a: "Cancellation policies vary by property. Contact the landlord through your dashboard or reach out to our support team for assistance.",
+    a: "Cancellation policies vary by property. Visit the landlord through your dashboard or reach out to our support team for assistance.",
   },
 ];
 
