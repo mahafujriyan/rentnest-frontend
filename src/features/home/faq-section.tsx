@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "How does the rental request process work?",
-    a: "Find a property you like, submit a rental request with your preferred dates, and wait for the landlord to approve. Once approved, you can proceed with payment.",
+    a: "Find a property you like, submit a rental request with your preferred dates, and wait for the landlord or house owner to approve. Once approved, you can proceed with payment.",
   },
   {
     q: "Is payment secure?",
