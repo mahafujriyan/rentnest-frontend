@@ -116,9 +116,9 @@ export function CategoriesSection() {
 export function PopularCities() {
   const cities = [
     { name: "New York", count: 120, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=300&fit=crop" },
-    { name: "Los Angeles", count: 98, image: "https://images.unsplash.com/photo-1580654712603-eb43229aff4d?w=400&h=300&fit=crop" },
+    { name: "Los Angeles", count: 98, image: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=400&h=300&fit=crop" },
     { name: "Chicago", count: 76, image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&h=300&fit=crop" },
-    { name: "Miami", count: 65, image: "https://images.unsplash.com/photo-1514214246283-d427a95a798d?w=400&h=300&fit=crop" },
+    { name: "Miami", count: 65, image: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=400&h=300&fit=crop" },
   ];
 
   return (
