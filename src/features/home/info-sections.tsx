@@ -22,7 +22,7 @@ const steps = [
   {
     icon: Star,
     title: "Move In & Review",
-    description: "Enjoy your new home and share your experience with others.",
+    description: "Enjoy your new home and share your experience with friends.",
   },
 ];
 
