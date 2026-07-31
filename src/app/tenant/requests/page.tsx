@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CreditCard } from "lucide-react";
 import { StatusBadge } from "@/components/shared/status-badge";
@@ -14,13 +15,14 @@ import { useCreateCheckout } from "@/hooks/use-payments";
 import { formatDate, formatPrice } from "@/lib/format";
 
 export default function TenantRequestsPage() {
+  const router = useRouter();
   const { data: rentals, isLoading, error, refetch } = useRentals();
   const createCheckout = useCreateCheckout();
 
   const handlePay = async (rentalId: string) => {
     try {
       const { url } = await createCheckout.mutateAsync(rentalId);
-      window.location.href = url;
+      router.push(url);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Payment failed");
     }

@@ -82,7 +82,7 @@ export default function TenantReviewsPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label>Property</Label>
-                <Select value={selectedProperty} onValueChange={setSelectedProperty}>
+                <Select value={selectedProperty} onValueChange={(v) => setSelectedProperty(v ?? "")}>
                   <SelectTrigger><SelectValue placeholder="Select property" /></SelectTrigger>
                   <SelectContent>
                     {(completedRentals || []).map((r) => (
@@ -95,7 +95,7 @@ export default function TenantReviewsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Rating (1-5)</Label>
-                <Input type="number" min={1} max={5} {...register("rating")} />
+                <Input type="number" min={1} max={5} {...register("rating", { valueAsNumber: true })} />
                 {errors.rating && <p className="text-sm text-destructive">{errors.rating.message}</p>}
               </div>
               <div className="space-y-2">

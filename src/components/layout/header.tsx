@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Building2,
   ChevronDown,
@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -102,17 +103,13 @@ export function Header() {
                 <ChevronDown className="size-4 text-muted-foreground" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem asChild>
-                  <Link href={dashboardPath}>
-                    <LayoutDashboard className="mr-2 size-4" />
-                    Dashboard
-                  </Link>
+                <DropdownMenuItem onClick={() => router.push(dashboardPath)}>
+                  <LayoutDashboard className="mr-2 size-4" />
+                  Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href={`${dashboardPath}/profile`}>
-                    <User className="mr-2 size-4" />
-                    Profile
-                  </Link>
+                <DropdownMenuItem onClick={() => router.push(`${dashboardPath}/profile`)}>
+                  <User className="mr-2 size-4" />
+                  Profile
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} className="text-destructive">

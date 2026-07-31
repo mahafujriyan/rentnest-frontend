@@ -2,15 +2,14 @@
 
 import { useCallback, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { PropertyCard } from "@/components/shared/property-card";
 import { PropertyGridSkeleton } from "@/components/shared/loading-skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ErrorState } from "@/components/shared/error-state";
+import { PropertyFiltersPanel } from "@/features/property/property-filters-panel";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -18,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useProperties, useCategories } from "@/hooks/use-properties";
 import type { PropertyFilters } from "@/types";
@@ -56,114 +54,16 @@ export default function PropertiesPage() {
   );
 
   const clearFilters = () => router.push("/properties");
-
   const hasFilters = Array.from(searchParams.keys()).length > 0;
 
-  const FilterPanel = () => (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <Label>Search</Label>
-        <Input
-          placeholder="Search properties..."
-          defaultValue={filters.search || ""}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              updateFilter("search", (e.target as HTMLInputElement).value || null);
-            }
-          }}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>City</Label>
-        <Input
-          placeholder="Enter city"
-          defaultValue={filters.city || ""}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              updateFilter("city", (e.target as HTMLInputElement).value || null);
-            }
-          }}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Category</Label>
-        <Select
-          value={filters.category || "all"}
-          onValueChange={(v) => updateFilter("category", v === "all" ? null : v)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="All categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
-            {(categories || []).map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="space-y-2">
-        <Label>Price Range</Label>
-        <Slider
-          defaultValue={[filters.minPrice || 0, filters.maxPrice || 5000]}
-          max={10000}
-          step={100}
-          onValueCommitted={([min, max]) => {
-            updateFilter("minPrice", min > 0 ? String(min) : null);
-            updateFilter("maxPrice", max < 10000 ? String(max) : null);
-          }}
-        />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>${filters.minPrice || 0}</span>
-          <span>${filters.maxPrice || "5000+"}</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Bedrooms</Label>
-          <Select
-            value={filters.bedrooms?.toString() || "any"}
-            onValueChange={(v) => updateFilter("bedrooms", v === "any" ? null : v)}
-          >
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Any</SelectItem>
-              {[1, 2, 3, 4, 5].map((n) => (
-                <SelectItem key={n} value={String(n)}>{n}+</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Bathrooms</Label>
-          <Select
-            value={filters.bathrooms?.toString() || "any"}
-            onValueChange={(v) => updateFilter("bathrooms", v === "any" ? null : v)}
-          >
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="any">Any</SelectItem>
-              {[1, 2, 3, 4].map((n) => (
-                <SelectItem key={n} value={String(n)}>{n}+</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {hasFilters && (
-        <Button variant="outline" className="w-full" onClick={clearFilters}>
-          <X className="mr-2 size-4" />
-          Clear Filters
-        </Button>
-      )}
-    </div>
+  const filterPanel = (
+    <PropertyFiltersPanel
+      filters={filters}
+      categories={categories}
+      hasFilters={hasFilters}
+      onUpdateFilter={updateFilter}
+      onClearFilters={clearFilters}
+    />
   );
 
   return (
@@ -180,7 +80,7 @@ export default function PropertiesPage() {
           <aside className="hidden w-72 shrink-0 lg:block">
             <div className="sticky top-24 rounded-2xl border bg-card p-6 shadow-sm">
               <h2 className="mb-4 font-semibold">Filters</h2>
-              <FilterPanel />
+              {filterPanel}
             </div>
           </aside>
 
@@ -195,15 +95,14 @@ export default function PropertiesPage() {
                   <SheetHeader>
                     <SheetTitle>Filters</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-6">
-                    <FilterPanel />
-                  </div>
+                  <div className="mt-6">{filterPanel}</div>
                 </SheetContent>
               </Sheet>
 
               <Select
                 value={`${filters.sortBy}-${filters.sortOrder}`}
                 onValueChange={(v) => {
+                  if (!v) return;
                   const [sortBy, sortOrder] = v.split("-");
                   updateFilter("sortBy", sortBy);
                   updateFilter("sortOrder", sortOrder);

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { StatusBadge } from "@/components/shared/status-badge";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
 import { Badge } from "@/components/ui/badge";

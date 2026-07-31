@@ -85,14 +85,14 @@ export function PropertyForm({ property, onSubmit, isSubmitting }: PropertyFormP
         </div>
         <div className="space-y-2">
           <Label>Price ($/month)</Label>
-          <Input type="number" {...register("price")} />
+          <Input type="number" {...register("price", { valueAsNumber: true })} />
           {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
         </div>
         <div className="space-y-2">
           <Label>Category</Label>
           <Select
             value={watch("categoryId") || ""}
-            onValueChange={(v) => setValue("categoryId", v, { shouldValidate: true })}
+            onValueChange={(v) => v && setValue("categoryId", v, { shouldValidate: true })}
           >
             <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
             <SelectContent>
@@ -105,15 +105,15 @@ export function PropertyForm({ property, onSubmit, isSubmitting }: PropertyFormP
         </div>
         <div className="space-y-2">
           <Label>Bedrooms</Label>
-          <Input type="number" {...register("bedrooms")} />
+          <Input type="number" {...register("bedrooms", { valueAsNumber: true })} />
         </div>
         <div className="space-y-2">
           <Label>Bathrooms</Label>
-          <Input type="number" {...register("bathrooms")} />
+          <Input type="number" {...register("bathrooms", { valueAsNumber: true })} />
         </div>
         <div className="space-y-2">
           <Label>Area (sqft)</Label>
-          <Input type="number" {...register("area")} />
+          <Input type="number" {...register("area", { valueAsNumber: true })} />
         </div>
         <div className="space-y-2">
           <Label>City</Label>

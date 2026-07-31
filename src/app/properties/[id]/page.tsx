@@ -44,7 +44,7 @@ export default function PropertyDetailPage() {
   const { data: property, isLoading, error, refetch } = useProperty(id);
   const { data: related } = useProperties({ category: property?.categoryId, limit: 3 });
   const createRental = useCreateRental();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");

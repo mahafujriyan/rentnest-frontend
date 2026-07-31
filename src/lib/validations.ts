@@ -22,10 +22,10 @@ export const registerSchema = z.object({
 export const propertySchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters"),
   description: z.string().min(20, "Description must be at least 20 characters"),
-  price: z.coerce.number().min(1, "Price must be greater than 0"),
-  bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more"),
-  bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more"),
-  area: z.coerce.number().optional(),
+  price: z.number().min(1, "Price must be greater than 0"),
+  bedrooms: z.number().min(0, "Bedrooms must be 0 or more"),
+  bathrooms: z.number().min(0, "Bathrooms must be 0 or more"),
+  area: z.number().optional(),
   address: z.string().min(5, "Address is required"),
   city: z.string().min(2, "City is required"),
   state: z.string().optional(),
@@ -43,7 +43,7 @@ export const rentalRequestSchema = z.object({
 });
 
 export const reviewSchema = z.object({
-  rating: z.coerce.number().min(1).max(5),
+  rating: z.number().min(1).max(5),
   comment: z.string().min(10, "Review must be at least 10 characters"),
 });
 

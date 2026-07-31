@@ -2,7 +2,6 @@ import api from "@/lib/axios";
 import type {
   ApiResponse,
   Category,
-  CreateCategoryData,
   CreatePropertyData,
   Property,
   PropertyFilters,
