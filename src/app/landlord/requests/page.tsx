@@ -50,7 +50,7 @@ export default function LandlordRequestsPage() {
                     Tenant: {req.tenant?.name} ({req.tenant?.email})
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(req.startDate)} — {formatDate(req.endDate)}
+                    {formatDate(req.startDate)} to {formatDate(req.endDate)}
                   </p>
                   {req.property && (
                     <p className="text-sm font-medium text-emerald-600">{formatPrice(req.property.price)}/month</p>

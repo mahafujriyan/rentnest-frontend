@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Building, Home, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -22,8 +22,8 @@ export default function RegisterPage() {
 
   const {
     register,
+    control,
     handleSubmit,
-    watch,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
@@ -31,7 +31,7 @@ export default function RegisterPage() {
     defaultValues: { role: "TENANT" },
   });
 
-  const selectedRole = watch("role");
+  const selectedRole = useWatch({ control, name: "role" });
 
   const onSubmit = async (data: RegisterFormData) => {
     try {

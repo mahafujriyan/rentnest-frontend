@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, FileText, CreditCard, Star } from "lucide-react";
 import { StatCard } from "@/components/shared/stat-card";
 import { DashboardSkeleton } from "@/components/shared/loading-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +15,31 @@ import { formatDate, formatPrice } from "@/lib/format";
 
 export default function TenantDashboard() {
   const { user } = useAuthStore();
-  const { data: rentals, isLoading: rentalsLoading } = useRentals();
-  const { data: payments, isLoading: paymentsLoading } = usePayments();
+  const {
+    data: rentals,
+    isLoading: rentalsLoading,
+    error: rentalsError,
+    refetch: refetchRentals,
+  } = useRentals();
+  const {
+    data: payments,
+    isLoading: paymentsLoading,
+    error: paymentsError,
+    refetch: refetchPayments,
+  } = usePayments();
 
   if (rentalsLoading || paymentsLoading) return <DashboardSkeleton />;
+  if (rentalsError || paymentsError) {
+    return (
+      <ErrorState
+        message={(rentalsError || paymentsError)?.message}
+        onRetry={() => {
+          refetchRentals();
+          refetchPayments();
+        }}
+      />
+    );
+  }
 
   const pending = rentals?.filter((r) => r.status === "PENDING").length || 0;
   const active = rentals?.filter((r) => r.status === "ACTIVE" || r.status === "APPROVED").length || 0;
@@ -26,8 +48,8 @@ export default function TenantDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Welcome back, {user?.name?.split(" ")[0]}!</h1>
-        <p className="mt-1 text-muted-foreground">Here&apos;s an overview of your rental activity</p>
+        <h1 className="text-3xl font-bold">Welcome back, {user?.name?.split(" ")[0] || "there"}!</h1>
+        <p className="mt-1 text-muted-foreground">Here&apos;s an overview of your rental activity.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

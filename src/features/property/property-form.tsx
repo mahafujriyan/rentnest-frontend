@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,9 +31,9 @@ export function PropertyForm({ property, onSubmit, isSubmitting }: PropertyFormP
 
   const {
     register,
+    control,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -60,8 +60,9 @@ export function PropertyForm({ property, onSubmit, isSubmitting }: PropertyFormP
         },
   });
 
-  const selectedAmenities = watch("amenities") || [];
-  const images = watch("images") || [""];
+  const selectedAmenities = useWatch({ control, name: "amenities" }) || [];
+  const images = useWatch({ control, name: "images" }) || [""];
+  const categoryId = useWatch({ control, name: "categoryId" }) || "";
 
   const toggleAmenity = (amenity: string) => {
     const next = selectedAmenities.includes(amenity)
@@ -91,7 +92,7 @@ export function PropertyForm({ property, onSubmit, isSubmitting }: PropertyFormP
         <div className="space-y-2">
           <Label>Category</Label>
           <Select
-            value={watch("categoryId") || ""}
+            value={categoryId}
             onValueChange={(v) => v && setValue("categoryId", v, { shouldValidate: true })}
           >
             <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>

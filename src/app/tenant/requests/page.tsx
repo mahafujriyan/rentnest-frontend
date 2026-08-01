@@ -61,7 +61,7 @@ export default function TenantRequestsPage() {
                     <StatusBadge status={rental.status} />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(rental.startDate)} — {formatDate(rental.endDate)}
+                    {formatDate(rental.startDate)} to {formatDate(rental.endDate)}
                   </p>
                   {rental.property && (
                     <p className="text-sm font-medium text-emerald-600">

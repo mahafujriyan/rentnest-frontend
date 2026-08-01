@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Building, FileText, DollarSign } from "lucide-react";
 import { StatCard } from "@/components/shared/stat-card";
 import { DashboardSkeleton } from "@/components/shared/loading-skeleton";
+import { ErrorState } from "@/components/shared/error-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +15,31 @@ import { formatDate, formatPrice } from "@/lib/format";
 
 export default function LandlordDashboard() {
   const { user } = useAuthStore();
-  const { data: properties, isLoading: propsLoading } = useLandlordProperties();
-  const { data: requests, isLoading: reqLoading } = useLandlordRequests();
+  const {
+    data: properties,
+    isLoading: propsLoading,
+    error: propertiesError,
+    refetch: refetchProperties,
+  } = useLandlordProperties();
+  const {
+    data: requests,
+    isLoading: reqLoading,
+    error: requestsError,
+    refetch: refetchRequests,
+  } = useLandlordRequests();
 
   if (propsLoading || reqLoading) return <DashboardSkeleton />;
+  if (propertiesError || requestsError) {
+    return (
+      <ErrorState
+        message={(propertiesError || requestsError)?.message}
+        onRetry={() => {
+          refetchProperties();
+          refetchRequests();
+        }}
+      />
+    );
+  }
 
   const pending = requests?.filter((r) => r.status === "PENDING").length || 0;
   const available = properties?.filter((p) => p.isAvailable).length || 0;
@@ -26,8 +48,8 @@ export default function LandlordDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Welcome, {user?.name?.split(" ")[0]}!</h1>
-        <p className="mt-1 text-muted-foreground">Manage your properties and rental house requests</p>
+        <h1 className="text-3xl font-bold">Welcome, {user?.name?.split(" ")[0] || "there"}!</h1>
+        <p className="mt-1 text-muted-foreground">Manage your properties and rental requests.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -52,7 +74,7 @@ export default function LandlordDashboard() {
                   <div>
                     <p className="font-medium">{req.property?.title || "Property"}</p>
                     <p className="text-sm text-muted-foreground">
-                      {req.tenant?.name} · {formatDate(req.startDate)} - {formatDate(req.endDate)}
+                      {req.tenant?.name || "Tenant"} - {formatDate(req.startDate)} to {formatDate(req.endDate)}
                     </p>
                   </div>
                   <StatusBadge status={req.status} />

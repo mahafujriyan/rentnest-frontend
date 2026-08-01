@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -36,44 +37,58 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Users</h1>
-        <p className="mt-1 text-muted-foreground">Manage platform users</p>
+        <p className="mt-1 text-muted-foreground">Manage platform users.</p>
       </div>
 
       <div className="rounded-2xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(users || []).map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell className="capitalize">{user.role.toLowerCase()}</TableCell>
-                <TableCell><StatusBadge status={user.status || "ACTIVE"} /></TableCell>
-                <TableCell>{user.createdAt ? formatDate(user.createdAt) : "—"}</TableCell>
-                <TableCell className="text-right">
-                  {user.status === "BANNED" ? (
-                    <Button size="sm" variant="outline" onClick={() => handleBan(user.id, "ACTIVE")}>
-                      Unban
-                    </Button>
-                  ) : (
-                    <Button size="sm" variant="destructive" onClick={() => handleBan(user.id, "BANNED")}>
-                      Ban
-                    </Button>
-                  )}
-                </TableCell>
+        {!users || users.length === 0 ? (
+          <EmptyState title="No users found" description="New users will appear here after registration." />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell className="capitalize">{user.role.toLowerCase()}</TableCell>
+                  <TableCell><StatusBadge status={user.status || "ACTIVE"} /></TableCell>
+                  <TableCell>{user.createdAt ? formatDate(user.createdAt) : "-"}</TableCell>
+                  <TableCell className="text-right">
+                    {user.status === "BANNED" ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleBan(user.id, "ACTIVE")}
+                        disabled={updateStatus.isPending}
+                      >
+                        Unban
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleBan(user.id, "BANNED")}
+                        disabled={updateStatus.isPending}
+                      >
+                        Ban
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );

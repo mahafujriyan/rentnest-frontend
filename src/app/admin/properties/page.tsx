@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { EmptyState } from "@/components/shared/empty-state";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
 import { Badge } from "@/components/ui/badge";
@@ -26,42 +27,46 @@ export default function AdminPropertiesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Properties</h1>
-        <p className="mt-1 text-muted-foreground">All platform properties</p>
+        <p className="mt-1 text-muted-foreground">Monitor all platform properties.</p>
       </div>
 
       <div className="rounded-2xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Landlord</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(properties || []).map((property) => (
-              <TableRow key={property.id}>
-                <TableCell className="font-medium">{property.title}</TableCell>
-                <TableCell>{property.city}</TableCell>
-                <TableCell>{formatPrice(property.price)}</TableCell>
-                <TableCell>{property.landlord?.name || "—"}</TableCell>
-                <TableCell>
-                  <Badge variant={property.isAvailable ? "default" : "secondary"}>
-                    {property.isAvailable ? "Available" : "Unavailable"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={`/properties/${property.id}`}>View</Link>
-                  </Button>
-                </TableCell>
+        {!properties || properties.length === 0 ? (
+          <EmptyState title="No properties found" description="Published properties will appear here." />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Landlord</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {properties.map((property) => (
+                <TableRow key={property.id}>
+                  <TableCell className="font-medium">{property.title}</TableCell>
+                  <TableCell>{property.city}</TableCell>
+                  <TableCell>{formatPrice(property.price)}</TableCell>
+                  <TableCell>{property.landlord?.name || "-"}</TableCell>
+                  <TableCell>
+                    <Badge variant={property.isAvailable ? "default" : "secondary"}>
+                      {property.isAvailable ? "Available" : "Unavailable"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link href={`/properties/${property.id}`}>View</Link>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );

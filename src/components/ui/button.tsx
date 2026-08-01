@@ -53,11 +53,12 @@ function Button({
   }) {
   const classes = cn(buttonVariants({ variant, size, className }))
 
-  if (asChild && React.isValidElement(props.children)) {
-    const child = props.children as React.ReactElement<{ className?: string }>
-    const { children, ...rest } = props
+  const { children, ...buttonProps } = props
+
+  if (asChild && React.isValidElement(children)) {
+    const child = children as React.ReactElement<{ className?: string }>
     return React.cloneElement(child, {
-      ...rest,
+      ...buttonProps,
       className: cn(classes, child.props.className),
     })
   }
@@ -66,7 +67,7 @@ function Button({
     <ButtonPrimitive
       data-slot="button"
       className={classes}
-      {...props}
+      {...buttonProps}
     />
   )
 }

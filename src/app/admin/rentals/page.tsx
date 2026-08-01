@@ -3,6 +3,7 @@
 import { StatusBadge } from "@/components/shared/status-badge";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
+import { EmptyState } from "@/components/shared/empty-state";
 import {
   Table,
   TableBody,
@@ -24,32 +25,36 @@ export default function AdminRentalsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Rentals</h1>
-        <p className="mt-1 text-muted-foreground">All rental transactions</p>
+        <p className="mt-1 text-muted-foreground">Review all rental transactions.</p>
       </div>
 
       <div className="rounded-2xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Property</TableHead>
-              <TableHead>Tenant</TableHead>
-              <TableHead>Period</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(rentals || []).map((rental) => (
-              <TableRow key={rental.id}>
-                <TableCell className="font-medium">{rental.property?.title || "—"}</TableCell>
-                <TableCell>{rental.tenant?.name || "—"}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {formatDate(rental.startDate)} — {formatDate(rental.endDate)}
-                </TableCell>
-                <TableCell><StatusBadge status={rental.status} /></TableCell>
+        {!rentals || rentals.length === 0 ? (
+          <EmptyState title="No rentals found" description="Rental activity will appear here." />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Property</TableHead>
+                <TableHead>Tenant</TableHead>
+                <TableHead>Period</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {rentals.map((rental) => (
+                <TableRow key={rental.id}>
+                  <TableCell className="font-medium">{rental.property?.title || "-"}</TableCell>
+                  <TableCell>{rental.tenant?.name || "-"}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {formatDate(rental.startDate)} to {formatDate(rental.endDate)}
+                  </TableCell>
+                  <TableCell><StatusBadge status={rental.status} /></TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );

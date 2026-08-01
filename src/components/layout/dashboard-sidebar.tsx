@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Building2, LogOut } from "lucide-react";
 import { APP_NAME } from "@/constants";
 import { useAuthStore } from "@/store/auth.store";
@@ -19,7 +19,14 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ links, title }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    router.refresh();
+    router.push("/login");
+  };
 
   return (
     <aside className="hidden w-64 shrink-0 flex-col border-r bg-card lg:flex">
@@ -40,7 +47,7 @@ export function DashboardSidebar({ links, title }: DashboardSidebarProps) {
           {links.map((link) => {
             const isActive =
               pathname === link.href ||
-              (link.href !== links[0].href && pathname.startsWith(link.href));
+              (link.href !== links[0].href && pathname.startsWith(`${link.href}/`));
 
             return (
               <Link
@@ -80,7 +87,7 @@ export function DashboardSidebar({ links, title }: DashboardSidebarProps) {
         <Button
           variant="ghost"
           className="w-full justify-start text-destructive hover:text-destructive"
-          onClick={logout}
+          onClick={handleLogout}
         >
           <LogOut className="mr-2 size-4" />
           Log out
@@ -101,7 +108,9 @@ export function DashboardMobileNav({
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur lg:hidden">
       <div className="flex items-center justify-around py-2">
         {links.slice(0, 5).map((link) => {
-          const isActive = pathname === link.href || pathname.startsWith(link.href);
+          const isActive =
+            pathname === link.href ||
+            (link.href !== links[0].href && pathname.startsWith(`${link.href}/`));
           return (
             <Link
               key={link.href}

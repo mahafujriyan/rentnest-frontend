@@ -6,11 +6,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Star } from "lucide-react";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
+import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -30,7 +31,7 @@ import { reviewService } from "@/services";
 import { useRentals } from "@/hooks/use-rentals";
 
 export default function TenantReviewsPage() {
-  const { data: rentals } = useRentals();
+  const { data: rentals, isLoading, error, refetch } = useRentals();
   const [open, setOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState("");
 
@@ -62,6 +63,9 @@ export default function TenantReviewsPage() {
       toast.error(err instanceof Error ? err.message : "Failed to submit review");
     }
   };
+
+  if (isLoading) return <TableSkeleton />;
+  if (error) return <ErrorState message={error.message} onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">

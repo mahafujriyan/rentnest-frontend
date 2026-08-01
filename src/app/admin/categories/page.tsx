@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/shared/empty-state";
+import { ErrorState } from "@/components/shared/error-state";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +32,7 @@ import { useCategories } from "@/hooks/use-properties";
 import { useCreateCategory } from "@/hooks/use-admin";
 
 export default function AdminCategoriesPage() {
-  const { data: categories, isLoading } = useCategories();
+  const { data: categories, isLoading, error, refetch } = useCategories();
   const createCategory = useCreateCategory();
   const [open, setOpen] = useState(false);
 
@@ -44,7 +46,7 @@ export default function AdminCategoriesPage() {
   const onSubmit = async (data: CategoryFormData) => {
     try {
       await createCategory.mutateAsync(data);
-      toast.success("Category created!");
+      toast.success("Category created");
       reset();
       setOpen(false);
     } catch (err) {
@@ -53,17 +55,19 @@ export default function AdminCategoriesPage() {
   };
 
   if (isLoading) return <TableSkeleton />;
+  if (error) return <ErrorState message={error.message} onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Categories</h1>
-          <p className="mt-1 text-muted-foreground">Manage property categories</p>
+          <p className="mt-1 text-muted-foreground">Manage property categories.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger className="inline-flex h-9 items-center gap-2 rounded-lg bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700">
-            <Plus className="size-4" />Add Category
+          <DialogTrigger className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+            <Plus className="size-4" />
+            Add Category
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Create Category</DialogTitle></DialogHeader>
@@ -77,7 +81,12 @@ export default function AdminCategoriesPage() {
                 <Label>Description</Label>
                 <Textarea {...register("description")} />
               </div>
-              <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                disabled={isSubmitting || createCategory.isPending}
+              >
+                {(isSubmitting || createCategory.isPending) && <Loader2 className="mr-2 size-4 animate-spin" />}
                 Create
               </Button>
             </form>
@@ -86,24 +95,28 @@ export default function AdminCategoriesPage() {
       </div>
 
       <div className="rounded-2xl border bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Properties</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(categories || []).map((cat) => (
-              <TableRow key={cat.id}>
-                <TableCell className="font-medium">{cat.name}</TableCell>
-                <TableCell className="text-muted-foreground">{cat.description || "—"}</TableCell>
-                <TableCell>{cat._count?.properties ?? 0}</TableCell>
+        {!categories || categories.length === 0 ? (
+          <EmptyState title="No categories found" description="Create categories so landlords can classify listings." />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Properties</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {categories.map((cat) => (
+                <TableRow key={cat.id}>
+                  <TableCell className="font-medium">{cat.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{cat.description || "-"}</TableCell>
+                  <TableCell>{cat._count?.properties ?? 0}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
