@@ -30,7 +30,7 @@ Find & List Rental Properties with Ease. **RentNest** is a commercial-grade SaaS
 
 ## 🛠️ Getting Started
 
-Follow these instructions to set up the project locally.
+Follow these instructions to set up the project 
 
 ### Prerequisites
 - Node.js 20+ installed
