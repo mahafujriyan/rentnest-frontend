@@ -27,7 +27,7 @@ export default function LandlordDashboard() {
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold">Welcome, {user?.name?.split(" ")[0]}!</h1>
-        <p className="mt-1 text-muted-foreground">Manage your properties and rental requests</p>
+        <p className="mt-1 text-muted-foreground">Manage your properties and rental house requests</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
