@@ -44,8 +44,8 @@ export default function ContactPage() {
             <div className="space-y-4">
               {[
                 { icon: Mail, label: "Email", value: "support@rentnest.com" },
-                { icon: Phone, label: "Phone", value: "+1 (555) 123-4567" },
-                { icon: MapPin, label: "Address", value: "123 Market St, San Francisco, CA" },
+                { icon: Phone, label: "Phone", value: "+880 1823-854567" },
+                { icon: MapPin, label: "Address", value: "123 Market St, Dhaka, Bangladesh" },
               ].map(({ icon: Icon, label, value }) => (
                 <Card key={label} className="border-0 shadow-sm">
                   <CardContent className="flex items-center gap-4 p-4">
