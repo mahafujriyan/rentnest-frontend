@@ -15,7 +15,11 @@ const landlordLinks = [
   { href: "/dashboard/landlord/profile", label: "Profile", icon: <User className="size-4" /> },
 ];
 
-export default function LandlordLayout({ children }: { children: React.ReactNode }) {
+export default function LandlordDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar links={landlordLinks} title="Landlord Dashboard" />
@@ -26,3 +30,4 @@ export default function LandlordLayout({ children }: { children: React.ReactNode
     </div>
   );
 }
+

@@ -5,9 +5,9 @@ import { TOKEN_KEY } from "@/constants";
 const publicRoutes = ["/", "/properties", "/about", "/contact", "/faq", "/login", "/register"];
 const authRoutes = ["/login", "/register"];
 
-const tenantRoutes = ["/tenant"];
-const landlordRoutes = ["/landlord"];
-const adminRoutes = ["/admin"];
+const tenantRoutes = ["/tenant", "/dashboard/tenant"];
+const landlordRoutes = ["/landlord", "/dashboard/landlord"];
+const adminRoutes = ["/admin", "/dashboard/admin"];
 
 function decodeToken(token: string): { role?: string; user?: { role?: string } } | null {
   try {
@@ -50,20 +50,24 @@ export function proxy(request: NextRequest) {
 
     if (isAuthRoute) {
       const dashboard =
-        role === "ADMIN" ? "/admin" : role === "LANDLORD" ? "/landlord" : "/tenant";
+        role === "ADMIN"
+          ? "/dashboard/admin"
+          : role === "LANDLORD"
+            ? "/dashboard/landlord"
+            : "/dashboard/tenant";
       return NextResponse.redirect(new URL(dashboard, request.url));
     }
 
     if (isTenantRoute && role !== "TENANT" && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/landlord", request.url));
+      return NextResponse.redirect(new URL("/dashboard/landlord", request.url));
     }
 
     if (isLandlordRoute && role !== "LANDLORD" && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/tenant", request.url));
+      return NextResponse.redirect(new URL("/dashboard/tenant", request.url));
     }
 
     if (isAdminRoute && role !== "ADMIN") {
-      return NextResponse.redirect(new URL("/tenant", request.url));
+      return NextResponse.redirect(new URL("/dashboard/tenant", request.url));
     }
   }
 

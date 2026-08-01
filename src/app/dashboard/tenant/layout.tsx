@@ -17,7 +17,11 @@ const tenantLinks = [
   { href: "/dashboard/tenant/profile", label: "Profile", icon: <User className="size-4" /> },
 ];
 
-export default function TenantLayout({ children }: { children: React.ReactNode }) {
+export default function TenantDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar links={tenantLinks} title="Tenant Dashboard" />
@@ -28,3 +32,4 @@ export default function TenantLayout({ children }: { children: React.ReactNode }
     </div>
   );
 }
+

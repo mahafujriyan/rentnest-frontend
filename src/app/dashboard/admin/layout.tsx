@@ -17,7 +17,11 @@ const adminLinks = [
   { href: "/dashboard/admin/rentals", label: "Rentals", icon: <FileText className="size-4" /> },
 ];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex min-h-screen">
       <DashboardSidebar links={adminLinks} title="Admin Dashboard" />
@@ -28,3 +32,4 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
+

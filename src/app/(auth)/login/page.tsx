@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Loader2 } from "lucide-react";
@@ -17,7 +16,6 @@ import { useAuthStore } from "@/store/auth.store";
 import { APP_NAME } from "@/constants";
 
 function LoginForm() {
-  const router = useRouter();
   const login = useAuthStore((s) => s.login);
 
   const {
@@ -32,8 +30,7 @@ function LoginForm() {
     try {
       const user = await login(data);
       toast.success("Welcome back!");
-      router.refresh();
-      router.push(getDashboardPath(user.role));
+      window.location.assign(getDashboardPath(user.role));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     }

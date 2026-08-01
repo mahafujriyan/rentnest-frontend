@@ -41,11 +41,11 @@ export function hasRole(user: User | null, roles: Role[]): boolean {
 export function getDashboardPath(role: Role): string {
   switch (role) {
     case "ADMIN":
-      return "/admin";
+      return "/dashboard/admin";
     case "LANDLORD":
-      return "/landlord";
+      return "/dashboard/landlord";
     case "TENANT":
     default:
-      return "/tenant";
+      return "/dashboard/tenant";
   }
 }

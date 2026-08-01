@@ -50,7 +50,10 @@ export function Header() {
         : NAV_LINKS.tenant
     : NAV_LINKS.public;
 
-  const isDashboard = pathname.startsWith("/tenant") ||
+  const isDashboard = pathname.startsWith("/dashboard/tenant") ||
+    pathname.startsWith("/dashboard/landlord") ||
+    pathname.startsWith("/dashboard/admin") ||
+    pathname.startsWith("/tenant") ||
     pathname.startsWith("/landlord") ||
     pathname.startsWith("/admin");
 
