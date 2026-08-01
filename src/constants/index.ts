@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://rentnest-dev.vercel.app/api";
+  "/api/backend";
 
 export const APP_NAME = "RentNest";
 export const APP_DESCRIPTION =

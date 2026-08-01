@@ -37,6 +37,7 @@ export default function RegisterPage() {
     try {
       const user = await registerUser(data);
       toast.success("Account created successfully!");
+      router.refresh();
       router.push(getDashboardPath(user.role));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Registration failed");

@@ -7,23 +7,43 @@ import type {
   User,
 } from "@/types";
 
+function isAuthResponse(value: unknown): value is AuthResponse {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "token" in value &&
+    "user" in value
+  );
+}
+
+function unwrapAuthResponse(
+  response: ApiResponse<AuthResponse> | AuthResponse,
+  fallbackMessage: string
+): AuthResponse {
+  const authData = isAuthResponse(response) ? response : response.data;
+
+  if (!isAuthResponse(authData)) {
+    throw new Error(("message" in response && response.message) || fallbackMessage);
+  }
+
+  return authData;
+}
+
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const { data } = await api.post<ApiResponse<AuthResponse>>(
+    const { data } = await api.post<ApiResponse<AuthResponse> | AuthResponse>(
       "/auth/login",
       credentials
     );
-    if (!data.data) throw new Error(data.message || "Login failed");
-    return data.data;
+    return unwrapAuthResponse(data, "Login failed");
   },
 
   register: async (registerData: RegisterData): Promise<AuthResponse> => {
-    const { data } = await api.post<ApiResponse<AuthResponse>>(
-      "/register",
+    const { data } = await api.post<ApiResponse<AuthResponse> | AuthResponse>(
+      "/auth/register",
       registerData
     );
-    if (!data.data) throw new Error(data.message || "Registration failed");
-    return data.data;
+    return unwrapAuthResponse(data, "Registration failed");
   },
 
   getMe: async (): Promise<User> => {

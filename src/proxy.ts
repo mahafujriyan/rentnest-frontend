@@ -9,18 +9,20 @@ const tenantRoutes = ["/tenant"];
 const landlordRoutes = ["/landlord"];
 const adminRoutes = ["/admin"];
 
-function decodeToken(token: string): { role?: string } | null {
+function decodeToken(token: string): { role?: string; user?: { role?: string } } | null {
   try {
     const payload = token.split(".")[1];
     if (!payload) return null;
-    const decoded = JSON.parse(atob(payload));
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+    const decoded = JSON.parse(atob(padded));
     return decoded;
   } catch {
     return null;
   }
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(TOKEN_KEY)?.value;
 
@@ -44,7 +46,7 @@ export function middleware(request: NextRequest) {
 
   if (token) {
     const decoded = decodeToken(token);
-    const role = decoded?.role;
+    const role = decoded?.role || decoded?.user?.role;
 
     if (isAuthRoute) {
       const dashboard =
