@@ -18,7 +18,7 @@ export default function TenantPaymentsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Payment History</h1>
-        <p className="mt-1 text-muted-foreground">View all your payment transactions</p>
+        <p className="mt-1 text-muted-foreground">View  your all payment transactions</p>
       </div>
 
       {!payments || payments.length === 0 ? (
