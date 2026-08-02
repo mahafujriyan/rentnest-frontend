@@ -21,7 +21,7 @@ export default function PaymentCancelPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3">
               <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                <Link href="/tenant/requests"><ArrowLeft className="mr-2 size-4" />Back to Requests</Link>
+                <Link href="/dashboard/tenant/requests"><ArrowLeft className="mr-2 size-4" />Back to Requests</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/properties">Browse Properties</Link>

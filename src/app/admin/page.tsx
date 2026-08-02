@@ -1,6 +1,6 @@
 "use client";
 
-import { Users, Building, FileText, DollarSign } from "lucide-react";
+import { Users, Building, FileText, DollarSign, Sparkles } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -13,7 +13,6 @@ import {
 import { StatCard } from "@/components/shared/stat-card";
 import { DashboardSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAdminStats } from "@/hooks/use-admin";
 import { formatPrice } from "@/lib/format";
 
@@ -33,23 +32,40 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Overview</h1>
-        <p className="mt-1 text-muted-foreground">Platform statistics and insights</p>
+      <section className="relative overflow-hidden rounded-3xl border border-emerald-500/15 bg-gradient-to-br from-slate-950 via-slate-900 to-emerald-950 px-6 py-8 text-white shadow-xl shadow-emerald-900/10 md:px-8">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-10 -top-16 size-56 rounded-full bg-emerald-400/20 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-20 left-1/3 size-48 rounded-full bg-sky-400/15 blur-3xl"
+        />
+        <div className="relative max-w-xl space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-emerald-200">
+            <Sparkles className="size-3.5" />
+            Admin control center
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Platform Overview</h1>
+          <p className="text-sm leading-relaxed text-slate-300 md:text-base">
+            Live insights across users, listings, rentals, and revenue.
+          </p>
+        </div>
+      </section>
+
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard title="Total Users" value={stats?.totalUsers || 0} icon={Users} accent="emerald" />
+        <StatCard title="Properties" value={stats?.totalProperties || 0} icon={Building} accent="sky" />
+        <StatCard title="Rentals" value={stats?.totalRentals || 0} icon={FileText} accent="amber" />
+        <StatCard title="Revenue" value={formatPrice(stats?.totalRevenue || 0)} icon={DollarSign} accent="violet" />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Users" value={stats?.totalUsers || 0} icon={Users} />
-        <StatCard title="Properties" value={stats?.totalProperties || 0} icon={Building} />
-        <StatCard title="Rentals" value={stats?.totalRentals || 0} icon={FileText} />
-        <StatCard title="Revenue" value={formatPrice(stats?.totalRevenue || 0)} icon={DollarSign} />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Platform Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <section className="overflow-hidden rounded-3xl border border-border/70 bg-card/80 shadow-sm backdrop-blur">
+        <div className="border-b border-border/60 px-6 py-5">
+          <h2 className="text-lg font-semibold tracking-tight">Platform Statistics</h2>
+          <p className="text-sm text-muted-foreground">Snapshot of marketplace health</p>
+        </div>
+        <div className="p-4 md:p-6">
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -61,8 +77,8 @@ export default function AdminDashboard() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   );
 }

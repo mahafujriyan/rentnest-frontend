@@ -21,7 +21,7 @@ export default function EditPropertyPage() {
         data: { ...data, images: data.images.filter(Boolean) },
       });
       toast.success("Property updated!");
-      router.push("/landlord/properties");
+      router.push("/dashboard/landlord/properties");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to update property");
     }

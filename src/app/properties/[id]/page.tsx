@@ -71,7 +71,7 @@ export default function PropertyDetailPage() {
       });
       toast.success("Rental request submitted!");
       setDialogOpen(false);
-      router.push("/tenant/requests");
+      router.push("/dashboard/tenant/requests");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to submit request");
     }

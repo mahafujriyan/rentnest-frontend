@@ -58,7 +58,7 @@ export default function LandlordPropertiesPage() {
           <p className="mt-1 text-muted-foreground">Manage your listed properties</p>
         </div>
         <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-          <Link href="/landlord/properties/new"><Plus className="mr-2 size-4" />Add Property</Link>
+          <Link href="/dashboard/landlord/properties/new"><Plus className="mr-2 size-4" />Add Property</Link>
         </Button>
       </div>
 
@@ -68,7 +68,7 @@ export default function LandlordPropertiesPage() {
           description="Create your first property listing to start receiving requests."
           action={
             <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-              <Link href="/landlord/properties/new">Create Property</Link>
+              <Link href="/dashboard/landlord/properties/new">Create Property</Link>
             </Button>
           }
         />
@@ -103,7 +103,7 @@ export default function LandlordPropertiesPage() {
                   <span className="text-xs text-muted-foreground">Available</span>
                 </div>
                 <Button variant="outline" size="icon" asChild>
-                  <Link href={`/landlord/properties/${property.id}/edit`}><Pencil className="size-4" /></Link>
+                  <Link href={`/dashboard/landlord/properties/${property.id}/edit`}><Pencil className="size-4" /></Link>
                 </Button>
                 <AlertDialog>
                   <AlertDialogTrigger className="inline-flex size-9 items-center justify-center rounded-lg border text-destructive hover:bg-destructive/10">

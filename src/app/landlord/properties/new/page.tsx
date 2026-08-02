@@ -17,7 +17,7 @@ export default function CreatePropertyPage() {
         images: data.images.filter(Boolean),
       });
       toast.success("Property created successfully!");
-      router.push("/landlord/properties");
+      router.push("/dashboard/landlord/properties");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to create property");
     }

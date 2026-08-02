@@ -115,7 +115,10 @@ export function Header() {
                   Profile
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-destructive">
+                <DropdownMenuItem onClick={() => {
+                  logout();
+                  window.location.assign("/login");
+                }} className="text-destructive">
                   <LogOut className="mr-2 size-4" />
                   Log out
                 </DropdownMenuItem>

@@ -21,10 +21,10 @@ export default function PaymentSuccessPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3">
               <Button asChild className="bg-emerald-600 hover:bg-emerald-700">
-                <Link href="/tenant/requests">View My Rentals <ArrowRight className="ml-2 size-4" /></Link>
+                <Link href="/dashboard/tenant/requests">View My Rentals <ArrowRight className="ml-2 size-4" /></Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/tenant/payments">Payment History</Link>
+                <Link href="/dashboard/tenant/payments">Payment History</Link>
               </Button>
             </div>
           </CardContent>

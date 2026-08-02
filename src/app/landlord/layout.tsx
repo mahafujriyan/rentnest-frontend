@@ -6,7 +6,7 @@ import {
   FileText,
   User,
 } from "lucide-react";
-import { DashboardSidebar, DashboardMobileNav } from "@/components/layout/dashboard-sidebar";
+import { DashboardShell } from "@/components/layout/dashboard-sidebar";
 
 const landlordLinks = [
   { href: "/dashboard/landlord", label: "Overview", icon: <LayoutDashboard className="size-4" /> },
@@ -17,12 +17,8 @@ const landlordLinks = [
 
 export default function LandlordLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen">
-      <DashboardSidebar links={landlordLinks} title="Landlord Dashboard" />
-      <main className="flex-1 overflow-auto pb-20 lg:pb-0">
-        <div className="container mx-auto p-4 md:p-8">{children}</div>
-      </main>
-      <DashboardMobileNav links={landlordLinks} />
-    </div>
+    <DashboardShell links={landlordLinks} title="Landlord">
+      {children}
+    </DashboardShell>
   );
 }

@@ -1,6 +1,6 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
-import Cookies from "js-cookie";
-import { API_BASE_URL, TOKEN_KEY } from "@/constants";
+import { API_BASE_URL } from "@/constants";
+import { clearAuth, getToken } from "@/lib/auth";
 import type { ApiResponse } from "@/types";
 
 const api = axios.create({
@@ -12,8 +12,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token =
-      typeof window !== "undefined" ? Cookies.get(TOKEN_KEY) : undefined;
+    const token = typeof window !== "undefined" ? getToken() : undefined;
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -33,7 +32,7 @@ api.interceptors.response.use(
       "Something went wrong. Please try again.";
 
     if (error.response?.status === 401 && typeof window !== "undefined") {
-      Cookies.remove(TOKEN_KEY);
+      clearAuth();
       const isAuthPage =
         window.location.pathname === "/login" ||
         window.location.pathname === "/register";

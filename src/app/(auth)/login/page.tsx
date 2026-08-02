@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Loader2 } from "lucide-react";
@@ -14,9 +15,30 @@ import { loginSchema, type LoginFormData } from "@/lib/validations";
 import { getDashboardPath } from "@/lib/auth";
 import { useAuthStore } from "@/store/auth.store";
 import { APP_NAME } from "@/constants";
+import type { Role } from "@/types";
+
+function getPostLoginPath(role: Role, redirect: string | null): string {
+  const dashboard = getDashboardPath(role);
+  if (!redirect || !redirect.startsWith("/") || redirect.startsWith("//")) {
+    return dashboard;
+  }
+  if (redirect.startsWith("/login") || redirect.startsWith("/register")) {
+    return dashboard;
+  }
+  if (redirect.startsWith("/dashboard/")) {
+    const allowed =
+      role === "ADMIN" ||
+      (role === "TENANT" && redirect.startsWith("/dashboard/tenant")) ||
+      (role === "LANDLORD" && redirect.startsWith("/dashboard/landlord"));
+    return allowed ? redirect : dashboard;
+  }
+  return redirect;
+}
 
 function LoginForm() {
   const login = useAuthStore((s) => s.login);
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const {
     register,
@@ -30,7 +52,7 @@ function LoginForm() {
     try {
       const user = await login(data);
       toast.success("Welcome back!");
-      window.location.assign(getDashboardPath(user.role));
+      window.location.assign(getPostLoginPath(user.role, redirect));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     }

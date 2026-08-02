@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Building2, Building, Home, Loader2 } from "lucide-react";
@@ -17,7 +16,6 @@ import { APP_NAME } from "@/constants";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const registerUser = useAuthStore((s) => s.register);
 
   const {
@@ -37,8 +35,7 @@ export default function RegisterPage() {
     try {
       const user = await registerUser(data);
       toast.success("Account created successfully!");
-      router.refresh();
-      router.push(getDashboardPath(user.role));
+      window.location.assign(getDashboardPath(user.role));
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Registration failed");
     }
