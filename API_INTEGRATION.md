@@ -43,7 +43,8 @@ JWT stored in cookie `rentnest_token`. Middleware decodes role for route protect
 |--------|----------|--------|-------------|
 | GET | `/payments` | Tenant | Payment history |
 | GET | `/payments/:id` | Auth | Payment details |
-| POST | `/payments` | Tenant | Create Stripe checkout `{ rentalId }` → `{ url }` |
+| POST | `/payments/create` | Tenant | Create Stripe checkout `{ rentalRequestId }` → `{ url }` |
+| POST | `/payments/confirm` | Stripe | Webhook (server only) |
 
 Redirect URLs: `/payment/success`, `/payment/cancel`
 

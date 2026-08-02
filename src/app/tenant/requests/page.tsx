@@ -22,11 +22,11 @@ export default function TenantRequestsPage() {
   const createCheckout = useCreateCheckout();
   const [payingId, setPayingId] = useState<string | null>(null);
 
-  const handlePay = async (rentalId: string) => {
-    setPayingId(rentalId);
+  const handlePay = async (rentalRequestId: string) => {
+    setPayingId(rentalRequestId);
     try {
-      const { url } = await createCheckout.mutateAsync(rentalId);
-      toast.success("Redirecting to secure checkout…");
+      const { url } = await createCheckout.mutateAsync(rentalRequestId);
+      toast.success("Opening Stripe checkout…");
       redirectToCheckout(url);
     } catch (err) {
       setPayingId(null);
@@ -60,9 +60,11 @@ export default function TenantRequestsPage() {
         <div className="space-y-4">
           {rentals.map((rental) => {
             const isPaying = payingId === rental.id;
+            const paymentStatus = rental.payment?.status;
             const alreadyPaid =
               rental.status === "ACTIVE" ||
-              rental.payment?.status === "COMPLETED";
+              paymentStatus === "COMPLETED";
+            const paymentPending = paymentStatus === "PENDING" && canPay(rental.status);
 
             return (
               <div
@@ -75,6 +77,9 @@ export default function TenantRequestsPage() {
                       {rental.property?.title || "Property"}
                     </h3>
                     <StatusBadge status={rental.status} />
+                    {paymentStatus && paymentStatus !== "COMPLETED" && (
+                      <StatusBadge status={paymentStatus} />
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {formatRentalDate(rental)}
@@ -87,6 +92,11 @@ export default function TenantRequestsPage() {
                   {alreadyPaid && (
                     <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
                       Payment completed
+                    </p>
+                  )}
+                  {paymentPending && (
+                    <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                      Checkout started — finish payment to activate this rental
                     </p>
                   )}
                 </div>
@@ -106,7 +116,7 @@ export default function TenantRequestsPage() {
                       ) : (
                         <>
                           <CreditCard className="mr-2 size-4" />
-                          Pay Now
+                          {paymentPending ? "Continue Payment" : "Pay Now"}
                         </>
                       )}
                     </Button>
