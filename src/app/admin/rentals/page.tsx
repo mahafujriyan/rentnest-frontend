@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useAdminRentals } from "@/hooks/use-admin";
-import { formatDate } from "@/lib/format";
+import { formatRentalDate } from "@/lib/format";
 
 export default function AdminRentalsPage() {
   const { data: rentals, isLoading, error, refetch } = useAdminRentals();
@@ -47,7 +47,7 @@ export default function AdminRentalsPage() {
                   <TableCell className="font-medium">{rental.property?.title || "-"}</TableCell>
                   <TableCell>{rental.tenant?.name || "-"}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {formatDate(rental.startDate)} to {formatDate(rental.endDate)}
+                    {formatRentalDate(rental)}
                   </TableCell>
                   <TableCell><StatusBadge status={rental.status} /></TableCell>
                 </TableRow>

@@ -64,8 +64,12 @@ export interface Rental {
   id: string;
   propertyId: string;
   tenantId: string;
-  startDate: string;
-  endDate: string;
+  /** Backend field — preferred move-in date */
+  moveInDate?: string;
+  /** @deprecated kept for older payloads; prefer moveInDate */
+  startDate?: string;
+  /** @deprecated not used by current backend */
+  endDate?: string;
   status: RentalStatus;
   message?: string;
   property?: Property;
@@ -160,8 +164,7 @@ export interface CreatePropertyData {
 
 export interface CreateRentalData {
   propertyId: string;
-  startDate: string;
-  endDate: string;
+  moveInDate: string;
   message?: string;
 }
 

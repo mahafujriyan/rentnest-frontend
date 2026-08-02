@@ -11,7 +11,7 @@ import { ErrorState } from "@/components/shared/error-state";
 import { Button } from "@/components/ui/button";
 import { useRentals } from "@/hooks/use-rentals";
 import { redirectToCheckout, useCreateCheckout } from "@/hooks/use-payments";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatPrice, formatRentalDate } from "@/lib/format";
 
 function canPay(status: string) {
   return status === "APPROVED";
@@ -77,7 +77,7 @@ export default function TenantRequestsPage() {
                     <StatusBadge status={rental.status} />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(rental.startDate)} to {formatDate(rental.endDate)}
+                    {formatRentalDate(rental)}
                   </p>
                   {rental.property && (
                     <p className="text-sm font-medium text-emerald-600">

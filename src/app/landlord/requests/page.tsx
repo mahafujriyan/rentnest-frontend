@@ -9,7 +9,7 @@ import { ErrorState } from "@/components/shared/error-state";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLandlordRequests, useUpdateRentalStatus } from "@/hooks/use-rentals";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatPrice, formatRentalDate } from "@/lib/format";
 
 export default function LandlordRequestsPage() {
   const { data: requests, isLoading, error, refetch } = useLandlordRequests();
@@ -50,7 +50,7 @@ export default function LandlordRequestsPage() {
                     Tenant: {req.tenant?.name} ({req.tenant?.email})
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(req.startDate)} to {formatDate(req.endDate)}
+                    {formatRentalDate(req)}
                   </p>
                   {req.property && (
                     <p className="text-sm font-medium text-emerald-600">{formatPrice(req.property.price)}/month</p>

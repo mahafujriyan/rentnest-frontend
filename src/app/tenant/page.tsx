@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useRentals } from "@/hooks/use-rentals";
 import { usePayments } from "@/hooks/use-payments";
 import { useAuthStore } from "@/store/auth.store";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatPrice, formatRentalDate } from "@/lib/format";
 
 export default function TenantDashboard() {
   const { user } = useAuthStore();
@@ -108,7 +108,7 @@ export default function TenantDashboard() {
                   <div className="min-w-0">
                     <p className="truncate font-medium">{rental.property?.title || "Property"}</p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
-                      {formatDate(rental.startDate)} — {formatDate(rental.endDate)}
+                      {formatRentalDate(rental)}
                     </p>
                   </div>
                   <StatusBadge status={rental.status} />

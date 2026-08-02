@@ -48,8 +48,7 @@ export default function PropertyDetailPage() {
   const createRental = useCreateRental();
   const { isAuthenticated, user } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [moveInDate, setMoveInDate] = useState("");
   const [message, setMessage] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -66,27 +65,30 @@ export default function PropertyDetailPage() {
       return;
     }
 
-    if (!startDate || !endDate) {
-      toast.error("Please select start and end dates");
+    if (!moveInDate) {
+      toast.error("Please select a move-in date");
       return;
     }
 
-    if (endDate <= startDate) {
-      toast.error("End date must be after start date");
+    if (!message.trim()) {
+      toast.error("Please add a short message for the landlord");
+      return;
+    }
+
+    if (moveInDate < today) {
+      toast.error("Move-in date cannot be in the past");
       return;
     }
 
     try {
       await createRental.mutateAsync({
         propertyId: id,
-        startDate,
-        endDate,
-        message: message.trim() || undefined,
+        moveInDate,
+        message: message.trim(),
       });
       toast.success("Rental request submitted!");
       setDialogOpen(false);
-      setStartDate("");
-      setEndDate("");
+      setMoveInDate("");
       setMessage("");
       router.push("/dashboard/tenant/requests");
     } catch (err) {
@@ -293,33 +295,27 @@ export default function PropertyDetailPage() {
                       </DialogHeader>
                       <div className="space-y-4 pt-2">
                         <div className="space-y-2">
-                          <Label htmlFor="startDate">Start Date</Label>
+                          <Label htmlFor="moveInDate">Move-in Date</Label>
                           <Input
-                            id="startDate"
+                            id="moveInDate"
                             type="date"
                             min={today}
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
+                            value={moveInDate}
+                            onChange={(e) => setMoveInDate(e.target.value)}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="endDate">End Date</Label>
-                          <Input
-                            id="endDate"
-                            type="date"
-                            min={startDate || today}
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="message">Message (optional)</Label>
+                          <Label htmlFor="message">Message for landlord</Label>
                           <Textarea
                             id="message"
-                            placeholder="Tell the landlord about yourself..."
+                            placeholder="Introduce yourself and share why this place fits you..."
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
+                            maxLength={300}
                           />
+                          <p className="text-xs text-muted-foreground">
+                            {message.trim().length}/300
+                          </p>
                         </div>
                         {!isAuthenticated && (
                           <p className="text-xs text-muted-foreground">
