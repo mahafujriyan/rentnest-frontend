@@ -15,6 +15,20 @@ export function formatDate(date: string | Date): string {
   }).format(new Date(date));
 }
 
+/** Prefer moveInDate from backend; fall back to legacy startDate. */
+export function formatRentalDate(rental: {
+  moveInDate?: string;
+  startDate?: string;
+  endDate?: string;
+}): string {
+  const date = rental.moveInDate || rental.startDate;
+  if (!date) return "Date TBD";
+  if (rental.endDate && rental.startDate && !rental.moveInDate) {
+    return `${formatDate(rental.startDate)} – ${formatDate(rental.endDate)}`;
+  }
+  return `Move-in ${formatDate(date)}`;
+}
+
 export function formatDateTime(date: string | Date): string {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",

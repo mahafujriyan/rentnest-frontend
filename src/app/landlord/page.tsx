@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useLandlordProperties } from "@/hooks/use-properties";
 import { useLandlordRequests } from "@/hooks/use-rentals";
 import { useAuthStore } from "@/store/auth.store";
-import { formatDate, formatPrice } from "@/lib/format";
+import { formatPrice, formatRentalDate } from "@/lib/format";
 
 export default function LandlordDashboard() {
   const { user } = useAuthStore();
@@ -108,7 +108,7 @@ export default function LandlordDashboard() {
                   <div className="min-w-0">
                     <p className="truncate font-medium">{req.property?.title || "Property"}</p>
                     <p className="mt-0.5 text-sm text-muted-foreground">
-                      {req.tenant?.name || "Tenant"} · {formatDate(req.startDate)} to {formatDate(req.endDate)}
+                      {req.tenant?.name || "Tenant"} · {formatRentalDate(req)}
                     </p>
                   </div>
                   <StatusBadge status={req.status} />

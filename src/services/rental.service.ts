@@ -20,12 +20,12 @@ function extractMessage(payload: unknown, fallback: string): string {
 function extractRental(payload: unknown): Rental | null {
   if (!isRecord(payload)) return null;
 
-  // Direct rental object
   if (
     (typeof payload.id === "string" || typeof payload._id === "string") &&
     (typeof payload.propertyId === "string" ||
       typeof payload.property_id === "string" ||
-      isRecord(payload.property))
+      isRecord(payload.property) ||
+      isRecord(payload.properties))
   ) {
     return normalizeRental(payload);
   }
@@ -68,19 +68,30 @@ function extractRentals(payload: unknown): Rental[] {
 
 function normalizeRental(raw: Record<string, unknown>): Rental {
   const id = String(raw.id ?? raw._id ?? "");
+  const propertyRaw = isRecord(raw.property)
+    ? raw.property
+    : isRecord(raw.properties)
+      ? raw.properties
+      : undefined;
+
   const propertyId = String(
-    raw.propertyId ?? raw.property_id ?? (isRecord(raw.property) ? raw.property.id : "")
+    raw.propertyId ?? raw.property_id ?? (propertyRaw ? propertyRaw.id : "")
   );
   const tenantId = String(
     raw.tenantId ?? raw.tenant_id ?? (isRecord(raw.tenant) ? raw.tenant.id : "")
+  );
+
+  const moveInDate = String(
+    raw.moveInDate ?? raw.move_in_date ?? raw.startDate ?? raw.start_date ?? ""
   );
 
   return {
     id,
     propertyId,
     tenantId,
-    startDate: String(raw.startDate ?? raw.start_date ?? ""),
-    endDate: String(raw.endDate ?? raw.end_date ?? ""),
+    moveInDate: moveInDate || undefined,
+    startDate: moveInDate || undefined,
+    endDate: typeof raw.endDate === "string" ? raw.endDate : undefined,
     status: (raw.status as Rental["status"]) || "PENDING",
     message:
       typeof raw.message === "string"
@@ -88,7 +99,9 @@ function normalizeRental(raw: Record<string, unknown>): Rental {
         : typeof raw.note === "string"
           ? raw.note
           : undefined,
-    property: isRecord(raw.property) ? (raw.property as unknown as Rental["property"]) : undefined,
+    property: propertyRaw
+      ? (propertyRaw as unknown as Rental["property"])
+      : undefined,
     tenant: isRecord(raw.tenant) ? (raw.tenant as unknown as Rental["tenant"]) : undefined,
     payment: isRecord(raw.payment) ? (raw.payment as unknown as Rental["payment"]) : undefined,
     createdAt: typeof raw.createdAt === "string" ? raw.createdAt : undefined,
@@ -96,19 +109,14 @@ function normalizeRental(raw: Record<string, unknown>): Rental {
   };
 }
 
-/** Convert HTML date (YYYY-MM-DD) to ISO so backends accepting Date/ISO both work. */
-function toApiDate(value: string): string {
-  if (!value) return value;
-  if (value.includes("T")) return value;
-  // Keep date-only as noon UTC to avoid timezone day-shift issues
-  return new Date(`${value}T12:00:00.000Z`).toISOString();
-}
-
 function toCreatePayload(rentalData: CreateRentalData) {
+  const moveIn = rentalData.moveInDate.includes("T")
+    ? rentalData.moveInDate
+    : new Date(`${rentalData.moveInDate}T12:00:00.000Z`).toISOString();
+
   const payload: Record<string, unknown> = {
     propertyId: rentalData.propertyId,
-    startDate: toApiDate(rentalData.startDate),
-    endDate: toApiDate(rentalData.endDate),
+    moveInDate: moveIn,
   };
 
   if (rentalData.message?.trim()) {
@@ -135,19 +143,17 @@ export const rentalService = {
     const { data } = await api.post<unknown>("/rentals", toCreatePayload(rentalData));
     const rental = extractRental(data);
 
-    // Some APIs return only { success, message } on create — treat 2xx as success
     if (!rental) {
       if (isRecord(data) && data.success === false) {
         throw new Error(extractMessage(data, "Failed to create rental request"));
       }
-      // Soft success: created but body shape unknown — return a minimal pending rental
       if (isRecord(data) && (data.success === true || typeof data.message === "string")) {
         return {
           id: typeof data.id === "string" ? data.id : `temp-${Date.now()}`,
           propertyId: rentalData.propertyId,
           tenantId: "",
-          startDate: rentalData.startDate,
-          endDate: rentalData.endDate,
+          moveInDate: rentalData.moveInDate,
+          startDate: rentalData.moveInDate,
           status: "PENDING",
           message: rentalData.message,
         };
@@ -173,13 +179,10 @@ export const rentalService = {
       if (isRecord(data) && data.success === false) {
         throw new Error(extractMessage(data, "Failed to update request"));
       }
-      // Status update succeeded without full body
       return {
         id,
         propertyId: "",
         tenantId: "",
-        startDate: "",
-        endDate: "",
         status: statusData.status,
       };
     }
