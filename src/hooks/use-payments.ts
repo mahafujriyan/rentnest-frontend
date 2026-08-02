@@ -1,5 +1,6 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { paymentService } from "@/services";
+import { rentalKeys } from "@/hooks/use-rentals";
 
 export const paymentKeys = {
   all: ["payments"] as const,
@@ -23,7 +24,19 @@ export function usePayment(id: string) {
 }
 
 export function useCreateCheckout() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (rentalId: string) => paymentService.createCheckout(rentalId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: paymentKeys.all });
+      queryClient.invalidateQueries({ queryKey: rentalKeys.all });
+    },
   });
+}
+
+/** Open Stripe Checkout in the same tab (external URL — never use Next router). */
+export function redirectToCheckout(url: string) {
+  if (typeof window === "undefined") return;
+  window.location.assign(url);
 }

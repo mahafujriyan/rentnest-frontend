@@ -1,29 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Loader2, ExternalLink } from "lucide-react";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { TableSkeleton } from "@/components/shared/loading-skeleton";
 import { ErrorState } from "@/components/shared/error-state";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useRentals } from "@/hooks/use-rentals";
-import { useCreateCheckout } from "@/hooks/use-payments";
+import { redirectToCheckout, useCreateCheckout } from "@/hooks/use-payments";
 import { formatDate, formatPrice } from "@/lib/format";
 
+function canPay(status: string) {
+  return status === "APPROVED";
+}
+
 export default function TenantRequestsPage() {
-  const router = useRouter();
   const { data: rentals, isLoading, error, refetch } = useRentals();
   const createCheckout = useCreateCheckout();
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   const handlePay = async (rentalId: string) => {
+    setPayingId(rentalId);
     try {
       const { url } = await createCheckout.mutateAsync(rentalId);
-      router.push(url);
+      toast.success("Redirecting to secure checkout…");
+      redirectToCheckout(url);
     } catch (err) {
+      setPayingId(null);
       toast.error(err instanceof Error ? err.message : "Payment failed");
     }
   };
@@ -34,8 +40,10 @@ export default function TenantRequestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Rental Requests</h1>
-        <p className="mt-1 text-muted-foreground">Track and manage your rental requests</p>
+        <h1 className="text-3xl font-bold tracking-tight">Rental Requests</h1>
+        <p className="mt-1 text-muted-foreground">
+          Track requests and complete payment once approved
+        </p>
       </div>
 
       {!rentals || rentals.length === 0 ? (
@@ -50,11 +58,19 @@ export default function TenantRequestsPage() {
         />
       ) : (
         <div className="space-y-4">
-          {rentals.map((rental) => (
-            <Card key={rental.id}>
-              <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-3">
+          {rentals.map((rental) => {
+            const isPaying = payingId === rental.id;
+            const alreadyPaid =
+              rental.status === "ACTIVE" ||
+              rental.payment?.status === "COMPLETED";
+
+            return (
+              <div
+                key={rental.id}
+                className="flex flex-col gap-4 rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0 space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-semibold">
                       {rental.property?.title || "Property"}
                     </h3>
@@ -68,16 +84,39 @@ export default function TenantRequestsPage() {
                       {formatPrice(rental.property.price)}/month
                     </p>
                   )}
+                  {alreadyPaid && (
+                    <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                      Payment completed
+                    </p>
+                  )}
                 </div>
-                <div className="flex gap-2">
-                  {rental.status === "APPROVED" && (
+
+                <div className="flex flex-wrap gap-2">
+                  {canPay(rental.status) && !alreadyPaid && (
                     <Button
                       className="bg-emerald-600 hover:bg-emerald-700"
                       onClick={() => handlePay(rental.id)}
                       disabled={createCheckout.isPending}
                     >
-                      <CreditCard className="mr-2 size-4" />
-                      Pay Now
+                      {isPaying ? (
+                        <>
+                          <Loader2 className="mr-2 size-4 animate-spin" />
+                          Opening checkout…
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="mr-2 size-4" />
+                          Pay Now
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  {alreadyPaid && (
+                    <Button variant="outline" asChild>
+                      <Link href="/dashboard/tenant/payments">
+                        View payment
+                        <ExternalLink className="ml-2 size-3.5" />
+                      </Link>
                     </Button>
                   )}
                   {rental.property && (
@@ -86,9 +125,9 @@ export default function TenantRequestsPage() {
                     </Button>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
