@@ -51,8 +51,10 @@ function LoginForm() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const user = await login(data);
+      const nextPath = getPostLoginPath(user.role, redirect);
       toast.success("Welcome back!");
-      window.location.assign(getPostLoginPath(user.role, redirect));
+      // Hard navigation so the proxy/middleware sees the fresh auth cookies
+      window.location.href = nextPath;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     }

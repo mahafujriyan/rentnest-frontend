@@ -68,7 +68,9 @@ function Button({
       data-slot="button"
       className={classes}
       {...buttonProps}
-    />
+    >
+      {children}
+    </ButtonPrimitive>
   )
 }
 

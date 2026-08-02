@@ -9,13 +9,15 @@ const COOKIE_OPTIONS = {
 };
 
 export function setAuth(token: string, user: User) {
-  Cookies.set(TOKEN_KEY, token, COOKIE_OPTIONS);
-  Cookies.set(USER_KEY, JSON.stringify(user), COOKIE_OPTIONS);
+  // Always set path=/ so proxy/middleware can read cookies on every route
+  const options = { ...COOKIE_OPTIONS, path: "/" };
+  Cookies.set(TOKEN_KEY, token, options);
+  Cookies.set(USER_KEY, JSON.stringify(user), options);
 }
 
 export function clearAuth() {
-  Cookies.remove(TOKEN_KEY);
-  Cookies.remove(USER_KEY);
+  Cookies.remove(TOKEN_KEY, { path: "/" });
+  Cookies.remove(USER_KEY, { path: "/" });
 }
 
 export function getToken(): string | undefined {
