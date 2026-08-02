@@ -36,11 +36,16 @@ export const propertySchema = z.object({
   categoryId: z.string().min(1, "Please select a category"),
 });
 
-export const rentalRequestSchema = z.object({
-  startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
-  message: z.string().optional(),
-});
+export const rentalRequestSchema = z
+  .object({
+    startDate: z.string().min(1, "Start date is required"),
+    endDate: z.string().min(1, "End date is required"),
+    message: z.string().optional(),
+  })
+  .refine((data) => !data.startDate || !data.endDate || data.endDate > data.startDate, {
+    message: "End date must be after start date",
+    path: ["endDate"],
+  });
 
 export const reviewSchema = z.object({
   rating: z.number().min(1).max(5),

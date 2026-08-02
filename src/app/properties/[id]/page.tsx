@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import {
   BedDouble,
   Calendar,
   Check,
+  Loader2,
   MapPin,
   Star,
   User,
@@ -37,6 +38,7 @@ import { useProperty, useProperties } from "@/hooks/use-properties";
 import { useCreateRental } from "@/hooks/use-rentals";
 import { useAuthStore } from "@/store/auth.store";
 import { formatPrice } from "@/lib/format";
+import { getDashboardPath } from "@/lib/auth";
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -44,16 +46,23 @@ export default function PropertyDetailPage() {
   const { data: property, isLoading, error, refetch } = useProperty(id);
   const { data: related } = useProperties({ category: property?.categoryId, limit: 3 });
   const createRental = useCreateRental();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [message, setMessage] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
   const handleRequest = async () => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !user) {
       router.push(`/login?redirect=/properties/${id}`);
+      return;
+    }
+
+    if (user.role !== "TENANT") {
+      toast.error("Only tenant accounts can send rental requests");
       return;
     }
 
@@ -62,15 +71,23 @@ export default function PropertyDetailPage() {
       return;
     }
 
+    if (endDate <= startDate) {
+      toast.error("End date must be after start date");
+      return;
+    }
+
     try {
       await createRental.mutateAsync({
         propertyId: id,
         startDate,
         endDate,
-        message,
+        message: message.trim() || undefined,
       });
       toast.success("Rental request submitted!");
       setDialogOpen(false);
+      setStartDate("");
+      setEndDate("");
+      setMessage("");
       router.push("/dashboard/tenant/requests");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to submit request");
@@ -97,7 +114,9 @@ export default function PropertyDetailPage() {
     );
   }
 
-  const images = property.images?.length ? property.images : ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop"];
+  const images = property.images?.length
+    ? property.images
+    : ["https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop"];
 
   return (
     <PublicLayout>
@@ -126,6 +145,7 @@ export default function PropertyDetailPage() {
                 {images.map((img, i) => (
                   <button
                     key={i}
+                    type="button"
                     onClick={() => setSelectedImage(i)}
                     className={`relative size-20 shrink-0 overflow-hidden rounded-lg border-2 ${
                       selectedImage === i ? "border-emerald-600" : "border-transparent"
@@ -195,7 +215,9 @@ export default function PropertyDetailPage() {
 
             <div className="rounded-2xl border bg-muted/30 p-8 text-center">
               <MapPin className="mx-auto size-8 text-muted-foreground" />
-              <p className="mt-2 font-medium">{property.city}, {property.state || property.country}</p>
+              <p className="mt-2 font-medium">
+                {property.city}, {property.state || property.country}
+              </p>
               <p className="text-sm text-muted-foreground">Map view coming soon</p>
             </div>
 
@@ -243,40 +265,81 @@ export default function PropertyDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {!property.isAvailable ? (
-                  <p className="text-center text-destructive">This property is currently unavailable</p>
+                  <p className="text-center text-destructive">
+                    This property is currently unavailable
+                  </p>
+                ) : isAuthenticated && user?.role !== "TENANT" ? (
+                  <div className="space-y-3 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Switch to a tenant account to send rental requests.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => router.push(getDashboardPath(user!.role))}
+                    >
+                      Go to dashboard
+                    </Button>
+                  </div>
                 ) : (
                   <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger className="inline-flex h-9 w-full items-center justify-center rounded-lg bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700">
+                    <DialogTrigger className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-emerald-600 px-4 text-sm font-medium text-white hover:bg-emerald-700">
                       <Calendar className="mr-2 size-4" />
                       Request Rental
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="sm:max-w-md">
                       <DialogHeader>
                         <DialogTitle>Submit Rental Request</DialogTitle>
                       </DialogHeader>
-                      <div className="space-y-4 pt-4">
+                      <div className="space-y-4 pt-2">
                         <div className="space-y-2">
-                          <Label>Start Date</Label>
-                          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                          <Label htmlFor="startDate">Start Date</Label>
+                          <Input
+                            id="startDate"
+                            type="date"
+                            min={today}
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                          />
                         </div>
                         <div className="space-y-2">
-                          <Label>End Date</Label>
-                          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                          <Label htmlFor="endDate">End Date</Label>
+                          <Input
+                            id="endDate"
+                            type="date"
+                            min={startDate || today}
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                          />
                         </div>
                         <div className="space-y-2">
-                          <Label>Message (optional)</Label>
+                          <Label htmlFor="message">Message (optional)</Label>
                           <Textarea
+                            id="message"
                             placeholder="Tell the landlord about yourself..."
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                           />
                         </div>
+                        {!isAuthenticated && (
+                          <p className="text-xs text-muted-foreground">
+                            You&apos;ll be asked to log in as a tenant before submitting.
+                          </p>
+                        )}
                         <Button
+                          type="button"
                           className="w-full bg-emerald-600 hover:bg-emerald-700"
                           onClick={handleRequest}
                           disabled={createRental.isPending}
                         >
-                          {createRental.isPending ? "Submitting..." : "Submit Request"}
+                          {createRental.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 size-4 animate-spin" />
+                              Submitting...
+                            </>
+                          ) : (
+                            "Submit Request"
+                          )}
                         </Button>
                       </div>
                     </DialogContent>
@@ -284,7 +347,9 @@ export default function PropertyDetailPage() {
                 )}
                 <div className="rounded-xl bg-muted/50 p-4 text-sm">
                   <p className="font-medium">Monthly Rent</p>
-                  <p className="text-2xl font-bold text-emerald-600">{formatPrice(property.price)}</p>
+                  <p className="text-2xl font-bold text-emerald-600">
+                    {formatPrice(property.price)}
+                  </p>
                 </div>
               </CardContent>
             </Card>
